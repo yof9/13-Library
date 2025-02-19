@@ -1,29 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <link rel="shortcut icon" href="./imgs/brand-icon-book.svg">
+
     <!-- Google webfont link for Petite Formal Script -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Petit+Formal+Script&display=swap" rel="stylesheet">
-    
+
     <link rel="stylesheet" href="./style.css">
     <script src="./library.js" defer></script>
-    <title>Library</title>
+    <title>Awlib</title>
 </head>
+
 <body>
     <header>
-        <div class="brand">
-            <img src="" alt="">
-            <p class="font-brand">Awlib</p>
-        </div>
-        <button class="btn add">New Book</button>
+        <a href="#" class="brand">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="#fff0" viewBox="0 0 128 128" xml:space="preserve">
+                <path d="M128 28.27v78.16H0V28.27h8.84v4.8H4.8v68.56h118.4V33.07h-4.04v-4.8z" />
+                <path style="fill:#beaa8c"
+                    d="M89.85 22.06c-15.27 1.68-24.22 7.07-24.22 7.07v72.5h2.44c4.18-1.39 13.22-4.12 22.88-5.18 13.24-1.46 25.64.44 25.64.44V23.53s-11.48-3.15-26.74-1.47zm-51.81 0c-15.27-1.68-26.75 1.47-26.75 1.47v73.36s12.4-1.9 25.64-.44c9.66 1.06 18.7 3.79 22.88 5.18h2.44v-72.5s-8.94-5.39-24.21-7.07z" />
+            </svg>
+            <h1 class="font-brand">Awlib</h1>
+        </a>
+        <button class="btn add-book btn-primary">Add Book</button>
+        <dialog class="dialog-add">
+            <div class="dialog-header">
+                <h3>Add details of the Book</h3>
+                <button class="btn btn-dialog btn-danger dialog-add-close btn-x">X</button>
+            </div>
+            <form action="#" method="dialog" id="add-form">
+                <legend>Inputs labeled by&nbsp;<span class="required">*</span> are required</legend>
+                <div class="input">
+                    <label for="title">Title:&nbsp;<span class="required">*</span></label>
+                    <input required aria-required="true" maxlength="50" autofocus type="text" id="title"
+                        placeholder="e.g: The Godfather">
+                </div>
+                <div class="input">
+                    <label for="author">Author:&nbsp;<span class="required">*</span></label>
+                    <input required aria-required="true" maxlength="50" type="text" id="author"
+                        placeholder="e.g: Mario Puzo">
+                </div>
+                <div class="input">
+                    <label for="pages-total">Total number of Pages:&nbsp;<span class="required">*</span></label>
+                    <input required aria-required="true" min="1" step="1" type="number" id="pages-total"
+                        placeholder="e.g: 333">
+                </div>
+                <div class="input">
+                    <label for="pages-read">Number of pages read:</label>
+                    <input min="0" step="1" type="number" id="pages-read" placeholder="e.g: 332">
+                </div>
+            </form>
+            <footer class="form-btns">
+                <button class="btn btn-danger btn-dialog dialog-add-close" type="button">Close</button>
+                <button class="btn btn-primary btn-dialog submit" form="add-form" type="submit">Submit</button>
+            </footer>
+        </dialog>
     </header>
     <main>
-        <h1 class="font-brand">Library</h1>
         <div class="books"></div>
+        <dialog class="dialog-read">
+            <div class="dialog-header">
+                <h3>Good job!! How many pages were read?</h3>
+                <button class="btn btn-dialog btn-danger dialog-read-close btn-x">X</button>
+            </div>
+            <form action="#" method="dialog" id="read-form">
+                <legend>Inputs labeled by&nbsp;<span class="required">*</span> are required</legend>
+                <div class="input">
+                    <label for="pages-to-read">Number of pages read:&nbsp;<span class="required">*</span></label>
+                    <input autofocus required aria-required="true" min="1" step="1" type="number" id="pages-to-read"
+                        placeholder="e.g: 1">
+                </div>
+            </form>
+            <footer class="form-btns">
+                <button class="btn btn-danger btn-dialog dialog-read-close" type="button">Close</button>
+                <button class="btn btn-primary btn-dialog submit" form="read-form" type="submit">Submit</button>
+            </footer>
+        </dialog>
     </main>
 </body>
+
 </html>
