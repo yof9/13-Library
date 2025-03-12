@@ -1,48 +1,81 @@
 "use strict";
-
-function Book(title, author, pages, read) {
-    if (!new.target) {
-        return;
+// function Book(title, author, pages, read) {
+    // if (!new.target) {
+    //     return;
+    // }
+    // this.title = title;
+    // this.author = author;
+    // this.pages = pages;
+    // this.read = read || 0;
+    // this.id = Book.prototype.id++;
+// };
+// Book.prototype = {
+//     id: 0,
+    // readBook(pages) {
+    //     let unread = this.pages - this.read
+    //     if (pages > unread) {
+    //         throw new Error(`pages read can't possibly exceed the unread ${unread} pages out of total ${this.pages} pages!!!`)
+    //     }
+    //     this.read += pages;
+    // }
+// };
+class Book {
+    #id;
+    static #stamp = 0;
+    constructor(title, author, pages, read) {
+        if (new.target === undefined) {
+            throw new SyntaxError({
+                message: "You must use the 'new' keyword when creating class Book.",
+                code: 0,
+            });
+        }
+        this.title = title;
+        this.author = author;
+        this.pages = pages;
+        this.read = read || 0;
+        this.#id = Book.#stamp++;
     }
-    this.title = title;
-    this.author = author;
-    this.pages = pages;
-    this.read = read || 0;
-    this.id = Book.prototype.id++;
-};
-
-Book.prototype = {
-    id: 0,
     readBook(pages) {
         let unread = this.pages - this.read
         if (pages > unread) {
-            throw new Error(`pages read can't possibly exceed the unread ${unread} pages out of total ${this.pages} pages!!!`)
+            throw new RangeError(`pages read can't possibly exceed the unread ${unread} pages out of total ${this.pages} pages!!!`)
         }
         this.read += pages;
     }
-};
-
-function isOwned(title, author, pages) {
-    return library.some((book) => {
-        return book.title === title && book.author === author && book.pages === pages;
-    });
-}
-
-function addBookToLibrary(title, author, pages, read) {
-    if (isOwned(title, author, pages)) {
-        alert("Book already in library");
-        return;
+    static getId(book) {
+        return #id in book ? book.#id : null; 
     }
-    const book = new Book(title, author, pages, read);
-    library.unshift(book);
-    return book;
 }
+// Create Library
+class Library {
+    static #library;
 
-function removeBookFromLibrary(id) {
-    let index = library.findIndex((book) => book.id === id)
-    if (index !== -1) {
-        library.splice(index, 1)
-        return true;
+    static addBookToLibrary(title, author, pages, read) {
+        if (Library.#isOwned(title, author, pages)) {
+            throw new ValueError({
+                message: "Book is already owned",
+                code: 1,
+            });
+        }
+        const book = new Book(title, author, pages, read);
+        Library.#library.unshift(book);
+        return book;
+    }
+    
+    static removeBookFromLibrary(id) {
+        let index =Library.#library.findIndex((book) => Book.getId(book) === id)
+        if (index !== -1) {
+            return Library.#library.splice(index, 1)
+        }
+        throw new ValueError({
+            message: "Book doesn't exist in Library",
+            code: 2,
+            });
+    }
+    static #isOwned(title, author, pages) {
+        return Library.#library.some((book) => {
+            return book.title === title && book.author === author && book.pages === pages;
+        });
     }
 }
 
@@ -232,8 +265,6 @@ const testBooks = [
     { title: "War and Peace", author: "Leo Tolstoy", pages: 1225 }
 ];
 
-// Create Library
-const library = [];
 
 // Select global nodes
 const booksContainer = document.querySelector("div.books");
@@ -248,3 +279,12 @@ document.addEventListener('DOMContentLoaded', function () {
     //show all test books and listen
     showAndListen();
 });
+
+// Create an Error logger function that logs error message
+// Add a way to logically display error message 
+// Fix close modal bug
+
+// Add a way to add an actual pdf, epub or other format book
+// Add a way to display image of book cover
+// Add a way to read book in browser
+// Add a way to download book
