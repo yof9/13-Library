@@ -36,18 +36,21 @@
                 <legend>Inputs labeled by&nbsp;<span class="required">*</span> are required</legend>
                 <div class="input">
                     <label for="title">Title:&nbsp;<span class="required">*</span></label>
-                    <input required aria-required="true" maxlength="50" autofocus type="text" id="title"
+                    <input required autocomplete="off" aria-required="true" maxlength="50" autofocus type="text" id="title"
                         placeholder="e.g: The Godfather">
+                    <span class="error"></span>
                 </div>
                 <div class="input">
                     <label for="author">Author:&nbsp;<span class="required">*</span></label>
-                    <input required aria-required="true" maxlength="50" type="text" id="author"
+                    <input required autocomplete="off" aria-required="true" maxlength="50" type="text" id="author"
                         placeholder="e.g: Mario Puzo">
+                    <span class="error"></span>
                 </div>
                 <div class="input">
                     <label for="pages-total">Total number of Pages:&nbsp;<span class="required">*</span></label>
-                    <input required aria-required="true" min="1" step="1" type="number" id="pages-total"
+                    <input required autocomplete="off" aria-required="true" min="1" step="1" type="number" id="pages-total"
                         placeholder="e.g: 333">
+                    <span class="error"></span>
                 </div>
                 <div class="input">
                     <label for="pages-read">Number of pages read:</label>
@@ -61,6 +64,7 @@
         </dialog>
     </header>
     <main>
+        <span class="error"></span>
         <div class="books"></div>
         <dialog class="dialog-read">
             <div class="dialog-header">
@@ -73,6 +77,7 @@
                     <label for="pages-to-read">Number of pages read:&nbsp;<span class="required">*</span></label>
                     <input autofocus required aria-required="true" min="1" step="1" type="number" id="pages-to-read"
                         placeholder="e.g: 1">
+                    <span class="error"></span>
                 </div>
             </form>
             <footer class="form-btns">
