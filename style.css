@@ -259,13 +259,17 @@ span.error {
     color: var(--clr-brand-danger, rgb(250, 50, 50));
     background: var(--clr-brand-secondary, rgb(190 170 140));
 }
-main span.error {
+main > span.error {
     display: none;
     position: fixed;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
 }
-main span.error.active {
+
+span.error.ative{
+    display: inline;
+}
+main > span.error.active {
     display: block;
 }

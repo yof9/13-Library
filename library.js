@@ -1,100 +1,5 @@
 "use strict";
 
-class Book {
-    #id;
-    static #stamp = 0;
-    constructor(title, author, pages, read) {
-        if (new.target === undefined) {
-            throw new SyntaxError({
-                message: "You must use the 'new' keyword when creating class Book.",
-                code: 0,
-            });
-        }
-        this.title = title;
-        this.author = author;
-        this.pages = pages;
-        this.read = parseInt(read) || 0;
-        this.#id = Book.#stamp++;
-    }
-    readBook(pagesToRead) {
-        let unread = this.pages - this.read
-        if (pagesToRead > unread) {
-            events.emit("error", {   
-                    type: "RangeError",
-                    message: `pages-to-read(${pagesToRead}) can't possibly exceed
-                     the unread-pages(${unread}) out of total-pages(${this.pages}).`,
-
-            });
-            return;
-        }
-        this.read += pagesToRead;
-        return this;
-    }
-    getPagesRead() {
-        return this.read;
-    }
-    static getId(book) {
-        return #id in book ? book.#id : null; 
-    }
-}
-
-// Create Library
-class Library {
-    static #library = [];
-
-    static addBook(bookLike) {
-        try {
-            if (Library.#bookIsOwned(bookLike.title, bookLike.author, bookLike.pages)) {
-                events.emit("error", {   
-                        type: "ValueError",
-                        message: `Book(${bookLike}) is already owned`,
-    
-                });
-                return;
-            }
-        } catch(err) {
-            throw valueError(`Got-:(${err}) :- when adding ${bookLike} to library `)
-        }
-
-        let book;
-        book = bookLike instanceof Book ? bookLike :
-                new Book(bookLike.title, bookLike.author, bookLike["pages-total"], bookLike["pages-read"]);
-
-        Library.#library.unshift(book);
-        return book;
-    }  
-    static removeBook(bookId) {
-        let index =Library.#library.findIndex((book) => Book.getId(book) === bookId)
-        if (index !== -1) {
-            return Library.#library.splice(index, 1)
-        }
-        events.emit("error", {
-                type: "ValueError",
-                message: "Book doesn't exist",
-        });
-        return;
-    }
-    static getBook(bookId) {
-        const book = Library.#library.find((book) => Book.getId(book) === bookId);
-        if (!book) {
-            events.emit("error", {
-                type: ValueError,
-                message: "Book doesn't exist",
-            });
-            return;
-        }
-        return book;
-    }
-    static getAllBooks() {
-        return Library.#library;
-    }
-    static #bookIsOwned(title, author, pages) {
-        return Library.#library.some((book) => {
-            return book.title === title && book.author === author && book.pages === pages;
-        });
-    }
-}
-
 /* 
 events - a super-basic Javascript (publish subscribe) pattern
 Events module by learncode.academy, (edited)
@@ -124,7 +29,81 @@ const events = {
         });
       }
     }
-  };
+};
+class Book {
+    #id;
+    static #stamp = 0;
+
+    constructor(title, author, pagesTotal, pagesRead) {
+        if (new.target === undefined) {
+            throw new SyntaxError({
+                message: "You must use the 'new' keyword when creating class Book.",
+            });
+        }
+        this.title = title;
+        this.author = author;
+        this.pagesTotal = parseInt(pagesTotal);
+        this.pagesRead = parseInt(pagesRead) || 0;
+        this.#id = Book.#stamp++;
+    }
+    readBook(pagesToRead) {
+
+        let unreadPages = this.pagesTotal - this.pagesRead;
+        if (parseInt(pagesToRead) > unreadPages) {
+            throw new RangeError( 
+                    `(You can't read(${pagesToRead}) more pages than remaining
+                    unread-pages(${unreadPages}) out of total-pages(${this.pagesTotal}).`);
+        }
+
+        this.pagesRead += parseInt(pagesToRead);
+    }
+    static getId(book) {
+        return #id in book ? book.#id : null; 
+    }
+}
+
+// Create Library
+class Library {
+    static #library = [];
+
+    static addBook(bookLike) {
+        if (!bookLike instanceof Object || !bookLike.title || 
+            !bookLike.author || !bookLike.pagesTotal instanceof Number) {
+            throw new ValueError(`Can't add book(${book}) that doesn't have all required fields.`)
+        }
+        if (Library.#bookIsOwned(bookLike.title, bookLike.author, bookLike.pagesTotal)) {
+            return;
+        }
+
+        let book;
+        book = bookLike instanceof Book ? bookLike :
+                new Book(bookLike.title, bookLike.author, bookLike["pages-total"], bookLike["pages-read"]);
+
+        Library.#library.unshift(book);
+        return book;
+    }  
+    static removeBook(bookId) {
+        let index =Library.#library.findIndex((book) => Book.getId(book) === bookId)
+        if (index !== -1) {
+            return Library.#library.splice(index, 1)
+        }
+    }
+    static getBook(bookId) {
+        const book = Library.#library.find((book) => Book.getId(book) === bookId);
+        if (!book) return;
+        return book;
+    }
+    static getAllBooks() {
+        return Library.#library;
+    }
+    static #bookIsOwned(title, author, pagesTotal) {
+        return Library.#library.some((book) => {
+            return book.title === title && 
+                book.author === author && 
+                book.pagesTotal === pagesTotal;
+        });
+    }
+}
 
 const dom = (function (){
     const domCache = {};
@@ -134,20 +113,34 @@ const dom = (function (){
     function cacheDom () {
 
         domCache.booksContainer = document.querySelector("div.books");
+        dom.errorMain = document.querySelector("main > span.error");
 
+        // Modals
         domCache.addBookModal = document.querySelector("dialog.dialog-add");
-        domCache.readBookModal = document.querySelector("dialog.dialog-read"); 
-        
-        domCache.readFormSubmitBtn = document.querySelector("button[form='read-form'");
+        domCache.readBookModal = document.querySelector("dialog.dialog-read");
+        domCache.modals = [domCache.readBookModal, domCache.addBookModal]; 
+
+        // Form elmts
+        domCache["add-form"] = document.querySelector("form#read-form");
+        domCache["read-form"] = document.querySelector("form#add-form");
+        domCache.forms = [domCache["read-form"], domCache["add-form"]]
 
         domCache["form#read-form input"] = document.querySelectorAll("form#read-form input");
         domCache["form#add-form input"] = document.querySelectorAll("form#add-form input");
+
+        domCache["add-form > span.error"] = document.querySelector("form#add-form > span.error"); 
+        domCache["read-form > span.error"] = document.querySelector("form#read-form > span.error"); 
+
+        domCache.readInput = document.querySelector("form#read-form input");
+        domCache.readFormSubmitBtn = document.querySelector("button[form='read-form'");
+
         events.emit("domCached");
+
     }
     function get(elmt) {
         return domCache[elmt]
     }
-    return {get};
+    return Object.assign({}, {get});
 })();
 
 (function pageController(){
@@ -179,11 +172,22 @@ const dom = (function (){
     events.on("domCached", init);
 
     function init() {
-    // Add test books to library
+        // Add test books to library
         addtestBooksToLibrary();
 
         //show all test books and listen
         displayAndListenerAdapter();
+
+        // Dialog logic
+        dom.get("forms").forEach((form) =>{
+            form.addEventListener("submit", (e)=>{    
+                e.preventDefault();
+                if (form.parentElement.querySelectorAll("span.error.active").length === 0){
+                    form.submit()
+                }
+            });
+        })
+
     }
 
     function validateForm(btn) {
@@ -208,6 +212,10 @@ const dom = (function (){
     
                     inputs[input.id] = input.value;
                     break;
+                
+                case "pages-read":
+                    inputs[input.id] = !/^\d+$/.test(input.value) ? 0 : parseInt(input.value);
+                    break;            
     
                 case "pages-total":
                 case "pages-to-read":
@@ -225,19 +233,15 @@ const dom = (function (){
     
                     inputs[input.id] = parseInt(input.value);
                     break;
-    
-                case "pages-read":
-                        inputs[input.id] = !/^\d+$/.test(input.value) ? 0 : parseInt(input.value);
-                        break;            
             }
         });
     
-        if (inputs["pages-tota"] && inputs["pages-read"] > inputs["pages-total"]) {
+        if (inputs["pages-total"] && inputs["pages-read"] > inputs["pages-total"]) {
             events.emit("error", {
                     type: "RangeError",
                     message: `Pages-read(${inputs["pages-read"]})
                      can't exceed pages-total(${inputs["pages-total"]})`,
-                    node: btn.form
+                    node: btn.form.id
                 }
             );
             inputs.error = true;
@@ -260,7 +264,11 @@ const dom = (function (){
                 let added = Library.addBook(validated);
                  added ? 
                     displayAndListenerAdapter([added], dom.get("booksContainer").firstElementChild) :
-                    undefined;
+                    events.emit("error", {   
+                        type: "ValueError",
+                        message: `Book(${bookLike}) is already owned`,
+                        node: "add-form"
+                    });
             }
             else if (btn.form.id == "read-form" && !validated.error) {
     
@@ -268,13 +276,38 @@ const dom = (function (){
                 let bookId = parseInt(btn.dataset.id);
                 const book = Library.getBook(bookId);
 
+                // If not found
+                if (!book) {
+                    events.emit("error", {   
+                            type: "ValueError",
+                            message: `Book not Found.`,
+                            node: "read-form"
+                    });
+                    return;
+                }
+                
+                // If invalid pages to be read
+                let pagesToRead = parseInt(validated["pages-to-read"]);
+                let unread;
+
+                if (pagesToRead > (unread = book.pagesTotal - book.pagesRead)) {
+                    events.emit("error", {   
+                            type: "RangeError",
+                            message: `pages-to-read(${pagesToRead}) can't possibly exceed
+                                the unread-pages(${unread}) out of total-pages(${book.pagesTotal}).`,
+                            node: dom.get("readInput")
+                            });
+                    return;
+                }
+
                 // Read book
-                if (!book || !book.readBook(validated["pages-to-read"])) return;
+                book.readBook(pagesToRead)
+
                 // Update book page read Info Display
                 const readDisplay = dom.get("booksContainer").
                     querySelector(`.info-wrapper[data-id="${bookId}"] .info.read`);                
     
-                readDisplay.textContent = book.getPagesRead();
+                readDisplay.textContent = book.pagesRead;
     
             }
         }
@@ -282,9 +315,17 @@ const dom = (function (){
     
             let bookId = parseInt(btn.dataset.id);
             const bookWrapper = btn.parentElement.parentElement
-    
-            Library.removeBook(bookId) ?
-                dom.get("booksContainer").removeChild(bookWrapper) : undefined;
+            
+            
+            if (Library.removeBook(bookId)) {
+                dom.get("booksContainer").removeChild(bookWrapper)
+            }
+            else {
+                events.emit("error", {   
+                    type: "ValueError",
+                    message: `Book not Found.`
+            });
+            }
         }
         else if (btn.classList.contains("add-book")) {
             dom.get("addBookModal").showModal();
@@ -304,7 +345,7 @@ const dom = (function (){
 
     function createBookCard(book) {
         if (!(book instanceof Book)) {
-            throw TypeError(`cant create book card if ${book} is not instance of ${Book}`);
+            throw new TypeError(`cant create book card if ${book} is not instance of ${Book}`);
         }
         const bookCard = document.createElement("div");
         bookCard.classList = "book";
@@ -313,14 +354,14 @@ const dom = (function (){
                         <div class="info-wrapper" data-id="${id}">
                                 <p class="info strong font-brand">${book.title}</p> 
                                 <p>by <span class="info strong font-brand">${book.author}</span></p>
-                                <p><span class="info read">${book.read}</span> pages read out of <span class="info">${book.pages}</span></p>
+                                <p><span class="info read">${book.pagesRead}</span> pages read out of <span class="info">${book.pagesTotal}</span></p>
                         </div>
                         <div class="book-btns">
                             <button class="btn btn-primary btn-book read-book" data-id="${id}">Read</button>
                             <button class="btn btn-danger btn-book remove-book" data-id="${id}">remove</button>
                         </div>
                     `;
-    return bookCard
+        return bookCard
     }
     function displayBooks(books) {
         const cards = []
@@ -352,30 +393,60 @@ const dom = (function (){
     }
 })();
 
-// (function errorLogger(){
-//     events.on("error", notify);
+(function errorLogger(){
+    events.on("error", notify);
 
     
-//     function notify({name, message, node=null}) {
-//         // Node has value when error is to displayed as form validation 
-//         const errorMessage = createErrorMessage(name, message, node ? "span" : "div");
-//         if (node) {
-//             node.nextElementSibling.innerHTML = errorMessage;
-//             node.addEventListener("input", () =>)
-//         }
-//         else {
+    function notify({type, message, node=null}) {
+        console.log(node)
+        
+        // Node has value(string||node) when error is to displayed as form validation
+        let actualNode, errorNode, event; 
+        const errorMessage = createErrorMessage(type, message, node ? "span" : "div");
+        
+        // Parse Nodes
+        if (node) {
+            // When input and input validation
+            if (typeof node  === "string") {
+                actualNode = dom.get(node);
+                errorNode = dom.get(`${node} > span.error`); 
+                event = "input";
+            }
+            // When form and form validation
+            else {
+                actualNode = node.parentElement;
+                errorNode = node;
+                event  = "click";
+            }
+        }
+        else {
+            actualNode = document;
+            errorNode = dom.get("errorMain"); 
+            event = "click";
+        }
 
-//         }
-//     }
-//     function createErrorMessage(name, message, nodeType){
-//         return `<${nodeType} class="type">${name}</${nodeType}>
-//                                     <${nodeType} class="message">${message}</${nodeType}>`;
-//     }
-// })();
+        // Implement error display
+        errorNode.innerHTML = errorMessage;
+        errorNode.classList.add("active");
+        alert(actualNode)
+        if(node) {
+            actualNode.addEventListener(event, function () {
+                alert(1)
+                errorNode.innerHTML="";
+                errorNode.classList.remove("active");
+            }, {once: true, capture: true});
+        }
+        
+
+    }
+    function createErrorMessage(type, message, nodeType){
+        return `<${nodeType} class="type">${type}: </${nodeType}>
+                <${nodeType} class="message">${message}</${nodeType}>`;
+    }
+})();
 
 
-// Create an Error logger function that logs error message
-// Add a way to logically display error message 
+
 // Fix close modal bug
 
 // Add a way to add an actual pdf, epub or other format book
