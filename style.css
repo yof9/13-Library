@@ -154,7 +154,7 @@ dialog:open::backdrop {
 
 dialog form {
     display: grid;
-    gap: 1em;
+    gap: .25em;
 }
 
 dialog footer {
@@ -188,7 +188,7 @@ dialog input:focus {
     border-bottom-color: var(--clr-brand-primary, rgb(180 120 20));
 }
 
-dialog .input {
+dialog div.input {
     display: grid;
     gap: .125em;
 }
@@ -256,20 +256,50 @@ header a:hover {
 
 /* Error styling */
 span.error {
+    display: flex;
     color: var(--clr-brand-danger, rgb(250, 50, 50));
-    background: var(--clr-brand-secondary, rgb(190 170 140));
-}
-main > span.error {
-    display: none;
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    min-height: 1.25em;
+    font-size: .75em;
+    letter-spacing: 0.2ch;
+    font-style: italic;
+    font-weight: 300;
 }
 
-span.error.ative{
-    display: inline;
+form>span.error {
+    width: 100%;
+    justify-content: center;
+    font-weight: 700;
 }
-main > span.error.active {
-    display: block;
+
+dialog.dialog-error {
+    flex-direction: column;
+    min-height: 50vh;
+    background: rgb(from var(--clr-dark, rgb(0 0 0)) r g b /1);
+    color: var(--clr-brand-danger, rgb(250, 50, 50));
+    padding: 1em;
+
+    button {
+        margin-left: auto;
+        border-radius: 1em;
+        padding: .5em 2em;
+    }
+
+    .error {
+        display: flex;
+        flex-direction: row;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    div {
+        white-space: nowrap;
+    }
+}
+
+dialog.dialog-error:open {
+    opacity: 1;
+    display: flex;
+    transition: all .3s allow-discrete ease-in;
 }

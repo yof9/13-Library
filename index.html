@@ -37,8 +37,8 @@
                 <span class="error"></span>
                 <div class="input">
                     <label for="title">Title:&nbsp;<span class="required">*</span></label>
-                    <input required autocomplete="off" aria-required="true" maxlength="50" autofocus type="text" id="title"
-                        placeholder="e.g: The Godfather">
+                    <input required autocomplete="off" aria-required="true" maxlength="50" autofocus type="text"
+                        id="title" placeholder="e.g: The Godfather">
                     <span class="error"></span>
                 </div>
                 <div class="input">
@@ -49,13 +49,13 @@
                 </div>
                 <div class="input">
                     <label for="pages-total">Total number of Pages:&nbsp;<span class="required">*</span></label>
-                    <input required autocomplete="off" aria-required="true" min="1" step="1" type="number" id="pages-total"
-                        placeholder="e.g: 333">
+                    <input required autocomplete="off" aria-required="true" min="1" step="1" type="number"
+                        id="pages-total" placeholder="e.g: 333">
                     <span class="error"></span>
                 </div>
                 <div class="input">
                     <label for="pages-read">Number of pages read:</label>
-                    <input min="0" step="1" type="number" id="pages-read" placeholder="e.g: 332">
+                    <input autocomplete="off" min="0" step="1" type="number" id="pages-read" placeholder="e.g: 332">
                     <span class="error"></span>
                 </div>
             </form>
@@ -66,7 +66,10 @@
         </dialog>
     </header>
     <main>
-        <span class="error"></span>
+        <dialog class="dialog-error">
+            <div class="error"></div>
+            <button class="btn btn-primary btn-error">Close</button>
+        </dialog>
         <div class="books"></div>
         <dialog class="dialog-read">
             <div class="dialog-header">
@@ -78,8 +81,8 @@
                 <span class="error"></span>
                 <div class="input">
                     <label for="pages-to-read">Number of pages read:&nbsp;<span class="required">*</span></label>
-                    <input autofocus required aria-required="true" min="1" step="1" type="number" id="pages-to-read"
-                        placeholder="e.g: 1">
+                    <input autofocus required autocomplete="off" aria-required="true" min="1" step="1" type="number"
+                        id="pages-to-read" placeholder="e.g: 1">
                     <span class="error"></span>
                 </div>
             </form>
