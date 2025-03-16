@@ -195,13 +195,6 @@ const dom = (function () {
         //show all test books and listen
         displayAndListenerAdapter();
     }
-    function addErrorRemover() {
-        dom.get("errorMainBtn").addEventListener("click", (e) => {
-            e.preventDefault();
-            errorNode.innerHTML = "";
-            errorNode.classList.remove("active");
-        })
-    }
 
     // Add test books
     function addtestBooksToLibrary() {
@@ -271,7 +264,7 @@ const dom = (function () {
             if (pagesToRead > (unread = book.pagesTotal - book.pagesRead)) {
                 events.emit("error", {
                     type: "RangeError",
-                    message: `Pages to read can't exceed unread(${unread}) pages.`,
+                    message: `Pages read can't exceed unread(${unread}) pages.`,
                     node: form,
                     form, form
                 });
